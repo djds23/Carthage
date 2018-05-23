@@ -574,6 +574,7 @@ public func buildScheme( // swiftlint:disable:this function_body_length cyclomat
 			}
 		}
 		.flatMapTaskEvents(.concat) { builtProductURL -> SignalProducer<URL, CarthageError> in
+			
 			return UUIDsForFramework(builtProductURL)
 				.collect()
 				.flatMap(.concat) { uuids -> SignalProducer<TaskEvent<URL>, CarthageError> in
@@ -1112,12 +1113,14 @@ private func stripDirectory(named directory: String, of frameworkURL: URL) -> Si
 
 /// Sends a set of UUIDs for each architecture present in the given framework.
 public func UUIDsForFramework(_ frameworkURL: URL) -> SignalProducer<Set<UUID>, CarthageError> {
+	print("DEANDEBUG UUIDsForFramework: \(frameworkURL)")
 	return SignalProducer { () -> Result<URL, CarthageError> in binaryURL(frameworkURL) }
 		.flatMap(.merge, UUIDsFromDwarfdump)
 }
 
 /// Sends a set of UUIDs for each architecture present in the given dSYM.
 public func UUIDsForDSYM(_ dSYMURL: URL) -> SignalProducer<Set<UUID>, CarthageError> {
+	print("DEANDEBUG UUIDsForDSYM: \(dSYMURL)")
 	return UUIDsFromDwarfdump(dSYMURL)
 }
 
@@ -1136,6 +1139,7 @@ public func BCSymbolMapsForFramework(_ frameworkURL: URL) -> SignalProducer<URL,
 
 /// Sends a set of UUIDs for each architecture present in the given URL.
 private func UUIDsFromDwarfdump(_ url: URL) -> SignalProducer<Set<UUID>, CarthageError> {
+	print("DEANDEBUG dwarfdump for url: \(url)")
 	let dwarfdumpTask = Task("/usr/bin/xcrun", arguments: [ "dwarfdump", "--uuid", url.path ])
 
 	return dwarfdumpTask.launch()
